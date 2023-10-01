@@ -64,16 +64,24 @@ def register(request):
 def following(request):
     return render(request, "network/following.html")
 
-def profile(request):
-    user = request.user
-    following = Follow.objects.filter(username=user).count()
-    followers = Follow.objects.filter(following=user).count()
+def profile(request, user_id):
+    user = User.objects.get(pk=user_id)
+    num_followers = Follow.objects.filter(user_being_followed=user).count()    
+    num_following = Follow.objects.filter(follower=user).count()
+    following = Follow.objects.filter(follower=request.user)   # get those follows which the curent user is following
     posts = Post.objects.filter(username=user)
+
+    followable = False
+    if not following.filter(user_being_followed=user).exists():    # check if the profile's user exist in those follows
+        followable = True
+
     return render(request, "network/profile.html", {
         "user": user,
-        "followers": followers,
+        "num_followers": num_followers,
+        "num_following": num_following,
         "following": following,
-        "posts":posts
+        "posts": posts,
+        "followable": followable
     })
 
 def new_post(request):

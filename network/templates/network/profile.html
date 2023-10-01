@@ -9,13 +9,18 @@
 
 <div>
     <ul>
-        <li>Followers: {{ followers }}</li>
-        <li>Following: {{ following }}</li>
+        {% if request.user != user and followable %}
+            <button>Follow</button>
+        {% elif request.user != user and not followable %}
+            <button>Unfollow</button>
+        {% endif %}
+        <li>Follower(s): {{ num_followers }}</li>
+        <li>Following: {{ num_following }}</li>
         {% for post in posts %}
         <li>Post</li>
         <ul class="border">
             <li>
-                <a href="{% url 'profile' %}">{{ post.username }}</a>
+                <a href="{% url 'profile' user.id %}">{{ post.username }}</a>
             </li>
             <li>{{ post.content }}</li>
             <li>{{ post.date }}</li>
