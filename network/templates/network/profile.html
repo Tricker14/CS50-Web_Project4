@@ -1,0 +1,26 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<style>
+    .border {
+        margin-right: 1%;
+    }
+</style>
+
+<div>
+    <ul>
+        <li>Followers: {{ followers }}</li>
+        <li>Following: {{ following }}</li>
+        {% for post in posts %}
+        <li>Post</li>
+        <ul class="border">
+            <li>
+                <a href="{% url 'profile' %}">{{ post.username }}</a>
+            </li>
+            <li>{{ post.content }}</li>
+            <li>{{ post.date }}</li>
+        </ul><br>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

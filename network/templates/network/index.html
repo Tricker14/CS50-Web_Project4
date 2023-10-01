@@ -1,0 +1,28 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <style>
+        .new-post-container {
+            margin-left: 1%;
+            margin-right: 1%;
+        }
+    </style>
+
+    {% for post in posts %}
+    <ul>
+        <li>
+            <a href="{% url 'profile' %}">{{ post.username }}</a>
+        </li>
+        <li>{{ post.content }}</li>
+        <li>{{ post.date }}</li>
+    </ul>
+    {% endfor %}
+
+    <div class="new-post-container">
+        <form action="{% url 'new_post' %}" method="post">
+            {% csrf_token %}
+            <textarea class="form-control" name="post" aria-label="With textarea"></textarea><br>
+            <button class="btn btn-primary" type="submit">Post</button>
+        </form>
+    </div>
+{% endblock %}
