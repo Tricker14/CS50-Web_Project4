@@ -13,8 +13,8 @@ class Post(models.Model):
         return f"User: {self.username} -- {self.content}"
 
 class Follow(models.Model):
-    follower = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="user_follower")
-    user_being_followed = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="user_followed")
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="following")
+    user_being_followed = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="follower")
 
     def __str__(self):
         return f"{self.follower} follow {self.user_being_followed}"

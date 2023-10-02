@@ -9,13 +9,13 @@
     </style>
 
     {% for post in posts %}
-    <ul>
-        <li>
-            <a href="{% url 'profile' post.username.id %}">{{ post.username }}</a>
-        </li>
-        <li>{{ post.content }}</li>
-        <li>{{ post.date }}</li>
-    </ul>
+        <ul>
+            <li>
+                <a href="{% url 'profile' post.username.id %}">{{ post.username }}</a>
+            </li>
+            <li>{{ post.content }}</li>
+            <li>{{ post.date }}</li>
+        </ul>
     {% endfor %}
 
     <div class="new-post-container">

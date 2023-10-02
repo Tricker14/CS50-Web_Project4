@@ -62,7 +62,28 @@ def register(request):
         return render(request, "network/register.html")
     
 def following(request):
-    return render(request, "network/following.html")
+    return index(request)
+
+def follow(request, user_id):
+    user = User.objects.get(pk=user_id)
+    if request.method == "POST":
+        new_follow = Follow(
+            follower = request.user,
+            user_being_followed = user 
+        )
+        new_follow.save()
+        return HttpResponseRedirect(reverse("profile", args=[user_id]))
+
+    return profile(request, user_id)
+
+def unfollow(request, user_id):
+    user = User.objects.get(pk=user_id)
+    if request.method == "POST":
+        unfollow = Follow.objects.get(follower=request.user, user_being_followed=user)
+        unfollow.delete()
+        return HttpResponseRedirect(reverse("profile", args=[user_id]))
+
+    return profile(request, user_id)
 
 def profile(request, user_id):
     user = User.objects.get(pk=user_id)
