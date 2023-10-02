@@ -7,7 +7,7 @@ from django.urls import reverse
 from .models import User, Post, Like, Follow
 
 def index(request):
-    posts = Post.objects.all().order_by("date")
+    posts = Post.objects.all().order_by("-date")
     return render(request, "network/index.html", {
         "posts": posts
     })
@@ -62,7 +62,17 @@ def register(request):
         return render(request, "network/register.html")
     
 def following(request):
-    return index(request)
+    following_user = Follow.objects.filter(follower=request.user)   # get users that current user are following
+    posts = Post.objects.none()
+    for user in following_user:
+        user = user.user_being_followed
+        post = Post.objects.filter(username=user)
+        posts = posts.union(post)
+
+    posts = posts.order_by("-date")
+    return render(request, "network/index.html", {
+        "posts": posts
+    })
 
 def follow(request, user_id):
     user = User.objects.get(pk=user_id)
