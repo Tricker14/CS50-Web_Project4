@@ -8,15 +8,15 @@
         }
     </style>
 
-    {% for post in posts %}
-        <ul>
-            <li>
-                <a href="{% url 'profile' post.username.id %}">{{ post.username }}</a>
-            </li>
-            <li>{{ post.content }}</li>
-            <li>{{ post.date }}</li>
-        </ul>
-        {% endfor %}
+    {% for post in page_obj %}
+    <ul>
+        <li>
+            <a href="{% url 'profile' post.username.id %}">{{ post.username }}</a>
+        </li>
+        <li>{{ post.content }}</li>
+        <li>{{ post.date }}</li>
+    </ul>
+    {% endfor %}
 
     <div class="new-post-container">
         <form action="{% url 'new_post' %}" method="post">
@@ -24,5 +24,23 @@
             <textarea class="form-control" name="post" aria-label="With textarea"></textarea><br>
             <button class="btn btn-primary" type="submit">Post</button>
         </form>
+    </div><br>
+
+    <div class="static-bottom">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+    
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a></li>
+            {% endif %}
+        </ul>
+    
+        <div class="text-center">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </div>
     </div>
 {% endblock %}

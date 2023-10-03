@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -8,8 +9,12 @@ from .models import User, Post, Like, Follow
 
 def index(request):
     posts = Post.objects.all().order_by("-date")
+    paginator = Paginator(posts, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
     return render(request, "network/index.html", {
-        "posts": posts
+        "posts": posts,
+        "page_obj": page_obj
     })
 
 def login_view(request):
@@ -70,8 +75,12 @@ def following(request):
         posts = posts.union(post)
 
     posts = posts.order_by("-date")
+    paginator = Paginator(posts, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
     return render(request, "network/index.html", {
-        "posts": posts
+        "posts": posts,
+        "page_obj": page_obj
     })
 
 def follow(request, user_id):
