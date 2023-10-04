@@ -1,37 +1,76 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-<style>
-    .border {
-        margin-right: 1%;
-    }
-</style>
 
-<div>
-    <ul>
-        {% if request.user != user and followable %}
-            <form action="{% url 'follow' user.id%}" method="post">
-                {% csrf_token %}
-                <button type="submit">Follow</button>
-            </form>
-        {% elif request.user != user and not followable %}
-            <form action="{% url 'unfollow' user.id%}" method="post">
-                {% csrf_token %}
-                <button type="submit">Unfollow</button>
-            </form>
-        {% endif %}
-        <li>Follower(s): {{ num_followers }}</li>
-        <li>Following: {{ num_following }}</li>
-        {% for post in posts %}
-        <li>Post</li>
-            <ul class="border">
-                <li>
-                    <a href="{% url 'profile' user.id %}">{{ post.username }}</a>
-                </li>
-                <li>{{ post.content }}</li>
-                <li>{{ post.date }}</li>
-            </ul><br>
-        {% endfor %}
-    </ul>
-</div>
+    {% if request.user != user and followable %}
+        <form action="{% url 'follow' user.id%}" method="post">
+            {% csrf_token %}
+            <div class="container p-2">
+                <button class="btn btn-info" type="submit">Follow</button>
+            </div>
+        </form>
+    {% elif request.user != user and not followable %}
+        <form action="{% url 'unfollow' user.id%}" method="post">
+            {% csrf_token %}
+            <div class="container p-2">
+                <button class="btn btn-info" type="submit">Unfollow</button>
+            </div>
+        </form>
+    {% endif %}
+    <div class="container">
+        <div class="row p-2 font-weight-bold">
+            User: {{ user }}
+        </div>
+        <div class="row">
+            <div class="col-1.5 p-2 font-weight-bold">
+                Followers: {{ num_followers }}
+            </div>
+            <div class="col p-2 font-weight-bold">
+                Following: {{ num_following }}
+            </div>
+        </div>
+    </div><br>
+    
+    {% for post in page_obj %}
+        <div class="container border">
+            <div class="row">
+                <div class="col">
+                    <a href="{% url 'profile' post.username.id %}">{{ post.username }}</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{ post.content }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{ post.date }}
+                </div>
+            </div>
+            <div class="row justify-content-between">
+                <div class="col-auto">
+                    <button class="btn btn-primary mt-1 mb-1" type="submit">Like</button>
+                </div>
+            </div>
+        </div><br>
+    {% endfor %}
+
+    <div class="static-bottom">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+    
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a></li>
+            {% endif %}
+        </ul>
+    
+        <div class="text-center">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </div>
+    </div>
 {% endblock %}

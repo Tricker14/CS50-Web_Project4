@@ -9,9 +9,11 @@ from .models import User, Post, Like, Follow
 
 def index(request):
     posts = Post.objects.all().order_by("-date")
+
     paginator = Paginator(posts, 5)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+
     return render(request, "network/index.html", {
         "posts": posts,
         "page_obj": page_obj
@@ -75,9 +77,11 @@ def following(request):
         posts = posts.union(post)
 
     posts = posts.order_by("-date")
+
     paginator = Paginator(posts, 5)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+
     return render(request, "network/index.html", {
         "posts": posts,
         "page_obj": page_obj
@@ -109,11 +113,15 @@ def profile(request, user_id):
     num_followers = Follow.objects.filter(user_being_followed=user).count()    
     num_following = Follow.objects.filter(follower=user).count()
     following = Follow.objects.filter(follower=request.user)   # get those follows which the curent user is following
-    posts = Post.objects.filter(username=user)
+    posts = Post.objects.filter(username=user).order_by("-date")
 
     followable = False
     if not following.filter(user_being_followed=user).exists():    # check if the profile's user exist in those follows
         followable = True
+
+    paginator = Paginator(posts, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     return render(request, "network/profile.html", {
         "user": user,
@@ -121,7 +129,8 @@ def profile(request, user_id):
         "num_following": num_following,
         "following": following,
         "posts": posts,
-        "followable": followable
+        "followable": followable,
+        "page_obj": page_obj
     })
 
 def new_post(request):
@@ -136,3 +145,6 @@ def new_post(request):
         return HttpResponseRedirect(reverse("index"))
 
     return index(request)
+
+def edit(request, post_id):
+    pass

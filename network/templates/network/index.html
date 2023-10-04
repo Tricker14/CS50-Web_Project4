@@ -1,28 +1,52 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    <style>
-        .new-post-container {
-            margin-left: 1%;
-            margin-right: 1%;
-        }
-    </style>
-
     {% for post in page_obj %}
-    <ul>
-        <li>
-            <a href="{% url 'profile' post.username.id %}">{{ post.username }}</a>
-        </li>
-        <li>{{ post.content }}</li>
-        <li>{{ post.date }}</li>
-    </ul>
+        <div class="container border">
+                <div class="row">
+                    <div class="col">
+                        <a href="{% url 'profile' post.username.id %}">{{ post.username }}</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ post.content }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ post.date }}
+                    </div>
+                </div>
+                <div class="row justify-content-between">
+                    <div class="col-auto mt-1 mb-1">
+                        <button class="btn btn-primary like" type="submit">Like</button>
+                    </div>
+                    <div class="col-auto mt-1 mb-1">
+                        <button class="btn btn-primary edit" type="submit">Edit</button>
+                    </div>
+                </div>
+        </div><br>
     {% endfor %}
 
-    <div class="new-post-container">
+    <div class="container border">
         <form action="{% url 'new_post' %}" method="post">
             {% csrf_token %}
-            <textarea class="form-control" name="post" aria-label="With textarea"></textarea><br>
-            <button class="btn btn-primary" type="submit">Post</button>
+            <div class="row p-1">
+                <div class="col">
+                    <label class="font-weight-bold lead" for="post">New Post</label>
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col">
+                    <textarea class="form-control" name="post" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col">
+                    <button class="btn btn-primary" type="submit">Post</button>
+                </div>
+            </div>
         </form>
     </div><br>
 
