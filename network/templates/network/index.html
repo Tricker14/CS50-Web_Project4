@@ -1,6 +1,14 @@
 {% extends "network/layout.html" %}
+{% load static %}
 
 {% block body %}
+    <script>
+        function check(id){
+            content = document.querySelector(`#textarea_${id}`).value;
+            console.log(content);
+        }
+    </script>
+
     {% for post in page_obj %}
         <div class="container border">
                 <div class="row">
@@ -22,9 +30,32 @@
                     <div class="col-auto mt-1 mb-1">
                         <button class="btn btn-primary like" type="submit">Like</button>
                     </div>
-                    <div class="col-auto mt-1 mb-1">
-                        <button class="btn btn-primary edit" type="submit">Edit</button>
-                    </div>
+                    {% if request.user == post.username %}
+                        <div class="col-auto mt-1 mb-1">
+                            <button type="button" class="btn btn-primary edit" data-toggle="modal" data-target="#edit_post_{{ post.id }}">Edit</button>
+
+                            <div class="modal fade" id="edit_post_{{ post.id }}" tabindex="-1" role="dialog" aria-labelledby="edit_post_{{ post.id }}" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                      </button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <textarea class="form-control" id="textarea_{{ post.id }}" name="content" rows="3">{{ post.content }}</textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                      <button type="button" class="btn btn-primary" onclick="check('{{post.id}}')">Save changes</button>
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    {% endif %}
                 </div>
         </div><br>
     {% endfor %}
@@ -67,4 +98,4 @@
             Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
         </div>
     </div>
-{% endblock %}
+{% endblock %}  
