@@ -4,7 +4,8 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.urls import reverse
-from django.core import serializers
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import User, Post, Like, Follow
 
@@ -147,5 +148,13 @@ def new_post(request):
 
     return index(request)
 
+@csrf_exempt
 def edit(request, post_id):
-    pass
+    if request.method == "POST":
+        data = json.loads(request.body)
+        content = data.get("content", "")
+
+        post = Post.objects.get(pk=post_id)
+        post.content = content
+        post.save()
+        return JsonResponse({"message": "Edit post successfully", "content": content})
