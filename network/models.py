@@ -8,6 +8,7 @@ class Post(models.Model):
     username = models.ForeignKey(User, on_delete=models.CASCADE, related_name="username_post")
     content = models.CharField(max_length=500)
     date = models.DateTimeField(auto_now_add=True)
+    like = models.IntegerField(default=0)
 
     def __str__(self):
         return f"User: {self.username} -- {self.content}"

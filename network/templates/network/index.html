@@ -2,25 +2,13 @@
 {% load static %}
 
 {% block body %}
-    <script>
-        function check(id){
-            content_val = document.querySelector(`#textarea_${id}`).value;
-            fetch(`/edit/${id}`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    content: content_val
-                })
-            })
-            .then(function(response){
-                return response.json();
-            })
-            .then(function(result){
-                console.log(result);
-                document.querySelector(`#content_${id}`).innerHTML = result.content;
-                $(`#edit_post_${id}`).modal('hide');
-            })
-        }
-    </script>
+    <div class="container">
+        {% if following %}
+            <h4>Following</h4>
+        {% else %}
+            <h4>All Post</h4>
+        {% endif %}
+    </div>
 
     {% for post in page_obj %}
         <div class="container border">
@@ -41,7 +29,8 @@
                 </div>
                 <div class="row justify-content-between">
                     <div class="col-auto mt-1 mb-1">
-                        <button class="btn btn-primary like" type="submit">Like</button>
+                        <button class="btn btn-danger" onclick="toggleLike('{{ post.id }}')" type="submit">&#x2665;</button>
+                        <span class="ml-2" id="like_count_{{ post.id }}">{{ post.like }}</span>
                     </div>
                     {% if request.user == post.username %}
                         <div class="col-auto mt-1 mb-1">
@@ -61,7 +50,7 @@
                                     </div>
                                     <div class="modal-footer">
                                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                      <button type="button" class="btn btn-primary" onclick="check('{{post.id}}')">Save changes</button>
+                                      <button type="button" class="btn btn-primary" onclick="edit_post('{{ post.id }}')">Save changes</button>
                                     </div>
                                   </div>
                                 </div>
@@ -111,4 +100,54 @@
             Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
         </div>
     </div>
+
+    <script>
+        function edit_post(id){
+            content_val = document.querySelector(`#textarea_${id}`).value;
+            fetch(`/edit/${id}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    content: content_val
+                })
+            })
+            .then(function(response){
+                return response.json();
+            })
+            .then(function(result){
+                console.log(result);
+                document.querySelector(`#content_${id}`).innerHTML = result.content;
+                $(`#edit_post_${id}`).modal('hide');
+            })
+        }
+
+        function toggleLike(id){
+            let isLike = false;
+            fetch(`/is_like/${id}`)
+            .then(function(response){
+                return response.json();
+            })
+            .then(function(result){
+                result = result.liked_posts;
+                result.forEach(function(i){
+                    if(parseInt(i) === parseInt(id)){
+                        isLike = true;
+                    }
+                });
+                let likeCount = document.querySelector(`#like_count_${id}`).innerHTML;
+                fetch(`/toggle_like/${id}`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        like_count: likeCount,
+                        is_like: isLike
+                    })
+                })
+                .then(function(response){
+                    return response.json();
+                })
+                .then(function(result){ 
+                    document.querySelector(`#like_count_${id}`).innerHTML = result.like_count;
+                })
+            })
+        }
+    </script>
 {% endblock %}  

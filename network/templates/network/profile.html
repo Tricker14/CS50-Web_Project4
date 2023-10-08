@@ -2,6 +2,19 @@
 {% load static %}
 
 {% block body %}
+    <div class="container">
+        <div class="row p-2 font-weight-bold">
+            User: {{ user }}
+        </div>
+        <div class="row">
+            <div class="col-1.5 p-2 font-weight-bold">
+                Followers: {{ num_followers }}
+            </div>
+            <div class="col p-2 font-weight-bold">
+                Following: {{ num_following }}
+            </div>
+        </div>
+    </div>
 
     {% if request.user != user and followable %}
         <form action="{% url 'follow' user.id%}" method="post">
@@ -18,19 +31,6 @@
             </div>
         </form>
     {% endif %}
-    <div class="container">
-        <div class="row p-2 font-weight-bold">
-            User: {{ user }}
-        </div>
-        <div class="row">
-            <div class="col-1.5 p-2 font-weight-bold">
-                Followers: {{ num_followers }}
-            </div>
-            <div class="col p-2 font-weight-bold">
-                Following: {{ num_following }}
-            </div>
-        </div>
-    </div><br>
     
     {% for post in page_obj %}
         <div class="container border">
@@ -40,7 +40,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col">
+                <div class="col" id="content_{{ post.id }}">
                     {{ post.content }}
                 </div>
             </div>
@@ -51,8 +51,35 @@
             </div>
             <div class="row justify-content-between">
                 <div class="col-auto">
-                    <button class="btn btn-primary like" type="submit">Like</button>
+                    <button class="btn btn-danger" onclick="toggleLike('{{ post.id }}')" type="submit">&#x2665;</button>
+                    <span class="ml-2" id="like_count_{{ post.id }}">{{ post.like }}</span>
                 </div>
+                {% if request.user == post.username %}
+                <div class="col-auto mt-1 mb-1">
+                    <button type="button" class="btn btn-primary edit" data-toggle="modal" data-target="#edit_post_{{ post.id }}">Edit</button>
+
+                    <div class="modal fade" id="edit_post_{{ post.id }}" tabindex="-1" role="dialog" aria-labelledby="edit_post_{{ post.id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Edit Post</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              <textarea class="form-control" id="textarea_{{ post.id }}" name="content" rows="3">{{ post.content }}</textarea>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-primary" onclick="edit_post('{{ post.id }}')">Save changes</button>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+
+                </div>
+            {% endif %}
             </div>
         </div><br>
     {% endfor %}
@@ -74,4 +101,54 @@
             Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
         </div>
     </div>
+
+    <script>
+        function edit_post(id){
+            content_val = document.querySelector(`#textarea_${id}`).value;
+            fetch(`/edit/${id}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    content: content_val
+                })
+            })
+            .then(function(response){
+                return response.json();
+            })
+            .then(function(result){
+                console.log(result);
+                document.querySelector(`#content_${id}`).innerHTML = result.content;
+                $(`#edit_post_${id}`).modal('hide');
+            })
+        }
+
+        function toggleLike(id){
+            let isLike = false;
+            fetch(`/is_like/${id}`)
+            .then(function(response){
+                return response.json();
+            })
+            .then(function(result){
+                result = result.liked_posts;
+                result.forEach(function(i){
+                    if(parseInt(i) === parseInt(id)){
+                        isLike = true;
+                    }
+                });
+                let likeCount = document.querySelector(`#like_count_${id}`).innerHTML;
+                fetch(`/toggle_like/${id}`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        like_count: likeCount,
+                        is_like: isLike
+                    })
+                })
+                .then(function(response){
+                    return response.json();
+                })
+                .then(function(result){ 
+                    document.querySelector(`#like_count_${id}`).innerHTML = result.like_count;
+                })
+            })
+        }
+    </script>
 {% endblock %}

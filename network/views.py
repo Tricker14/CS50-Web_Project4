@@ -17,10 +17,9 @@ def index(request):
     page_obj = paginator.get_page(page_number)
 
     return render(request, "network/index.html", {
-        "posts": posts,
-        "page_obj": page_obj
+        "page_obj": page_obj,
     })
-
+    
 def login_view(request):
     if request.method == "POST":
 
@@ -86,7 +85,8 @@ def following(request):
 
     return render(request, "network/index.html", {
         "posts": posts,
-        "page_obj": page_obj
+        "page_obj": page_obj,
+        "following": True
     })
 
 def follow(request, user_id):
@@ -158,3 +158,43 @@ def edit(request, post_id):
         post.content = content
         post.save()
         return JsonResponse({"message": "Edit post successfully", "content": content})
+
+def is_like(request, post_id):
+    # find posts that current user like (id post)
+    liked_posts = Like.objects.filter(username=request.user).values_list("post", flat=True)
+    liked_posts = list(liked_posts)
+
+    return JsonResponse({"liked_posts": liked_posts})
+ 
+@csrf_exempt
+def toggle_like(request, post_id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        like_count = int(data.get("like_count", 0))
+        is_like = bool(data.get("is_like", False))
+
+        if not is_like:
+            like_count += 1
+
+            post = Post.objects.get(pk=post_id)
+            post.like = like_count
+            post.save()
+
+            # create a new Like object
+            new_like = Like(
+                username = request.user,
+                post = post
+            )
+            new_like.save()
+            return JsonResponse({"message": "Like succesfully", "like_count": post.like})
+        else:
+            like_count -= 1
+
+            post = Post.objects.get(pk=post_id)
+            post.like = like_count
+            post.save()
+
+            # delete Like object
+            old_like = Like.objects.get(username=request.user, post=post)
+            old_like.delete()
+            return JsonResponse({"message": "Unlike succesfully", "like_count": post.like})
