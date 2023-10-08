@@ -29,8 +29,14 @@
                 </div>
                 <div class="row justify-content-between">
                     <div class="col-auto mt-1 mb-1">
-                        <button class="btn btn-danger" onclick="toggleLike('{{ post.id }}')" type="submit">&#x2665;</button>
-                        <span class="ml-2" id="like_count_{{ post.id }}">{{ post.like }}</span>
+                        {% if request.user.is_authenticated %}
+                            {% if post.id in liked_posts %}
+                                <i class="fa fa-heart" id="like_color_{{ post.id }}" style="color: red; cursor: pointer;" onclick="toggleLike('{{ post.id }}')"></i>
+                            {% else %}
+                                <i class="fa fa-heart" id="like_color_{{ post.id }}" style="color: gray; cursor: pointer;" onclick="toggleLike('{{ post.id }}')"></i>
+                            {% endif %}
+                            <span class="ml-2" id="like_count_{{ post.id }}">{{ post.like }}</span>
+                        {% endif %}
                     </div>
                     {% if request.user == post.username %}
                         <div class="col-auto mt-1 mb-1">
@@ -146,6 +152,13 @@
                 })
                 .then(function(result){ 
                     document.querySelector(`#like_count_${id}`).innerHTML = result.like_count;
+                    let color = document.querySelector(`#like_color_${id}`);
+                    if(color.style.color === "red"){
+                        color.style.color = "gray";
+                    }
+                    else{
+                        color.style.color = "red";
+                    }
                 })
             })
         }

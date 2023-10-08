@@ -16,8 +16,15 @@ def index(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    # find posts that current user like (id post)
+    if request.user.is_authenticated:
+        liked_posts = Like.objects.filter(username=request.user).values_list("post", flat=True)
+    else:
+        liked_posts = []
+
     return render(request, "network/index.html", {
         "page_obj": page_obj,
+        "liked_posts": liked_posts,
     })
     
 def login_view(request):
@@ -125,6 +132,12 @@ def profile(request, user_id):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    # find posts that current user like (id post)
+    if request.user.is_authenticated:
+        liked_posts = Like.objects.filter(username=request.user).values_list("post", flat=True)
+    else:
+        liked_posts = []
+
     return render(request, "network/profile.html", {
         "user": user,
         "num_followers": num_followers,
@@ -132,7 +145,8 @@ def profile(request, user_id):
         "following": following,
         "posts": posts,
         "followable": followable,
-        "page_obj": page_obj
+        "page_obj": page_obj,
+        "liked_posts": liked_posts,
     })
 
 def new_post(request):
