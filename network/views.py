@@ -23,6 +23,7 @@ def index(request):
         liked_posts = []
 
     return render(request, "network/index.html", {
+        "posts": posts,
         "page_obj": page_obj,
         "liked_posts": liked_posts,
     })
