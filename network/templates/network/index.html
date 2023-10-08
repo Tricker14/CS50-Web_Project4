@@ -16,6 +16,27 @@
         </div>
     {% endif %}
 
+    <div class="container border">
+        <form action="{% url 'new_post' %}" method="post">
+            {% csrf_token %}
+            <div class="row p-1">
+                <div class="col">
+                    <label class="font-weight-bold lead" for="post">New Post</label>
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col">
+                    <textarea class="form-control" name="post" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col">
+                    <button class="btn btn-primary" type="submit">Post</button>
+                </div>
+            </div>
+        </form>
+    </div><br>
+
     {% for post in page_obj %}
         <div class="container border">
                 <div class="row">
@@ -73,27 +94,6 @@
                 </div>
         </div><br>
     {% endfor %}
-
-    <div class="container border">
-        <form action="{% url 'new_post' %}" method="post">
-            {% csrf_token %}
-            <div class="row p-1">
-                <div class="col">
-                    <label class="font-weight-bold lead" for="post">New Post</label>
-                </div>
-            </div>
-            <div class="row p-1">
-                <div class="col">
-                    <textarea class="form-control" name="post" rows="3"></textarea>
-                </div>
-            </div>
-            <div class="row p-1">
-                <div class="col">
-                    <button class="btn btn-primary" type="submit">Post</button>
-                </div>
-            </div>
-        </form>
-    </div><br>
 
     <div class="static-bottom">
         <ul class="pagination justify-content-center">

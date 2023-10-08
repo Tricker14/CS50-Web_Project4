@@ -12,7 +12,7 @@ from .models import User, Post, Like, Follow
 def index(request):
     posts = Post.objects.all().order_by("-date")
 
-    paginator = Paginator(posts, 5)
+    paginator = Paginator(posts, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
@@ -87,7 +87,7 @@ def following(request):
 
     posts = posts.order_by("-date")
 
-    paginator = Paginator(posts, 5)
+    paginator = Paginator(posts, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
@@ -129,10 +129,10 @@ def profile(request, user_id):
     if not following.filter(user_being_followed=user).exists():    # check if the profile's user exist in those follows
         followable = True
 
-    paginator = Paginator(posts, 5)
+    paginator = Paginator(posts, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-
+    
     # find posts that current user like (id post)
     if request.user.is_authenticated:
         liked_posts = Like.objects.filter(username=request.user).values_list("post", flat=True)
