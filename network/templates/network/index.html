@@ -10,6 +10,12 @@
         {% endif %}
     </div>
 
+    {% if not posts %}
+        <div class="container">
+            <h5>You have not followed any users</h5>
+        </div>
+    {% endif %}
+
     {% for post in page_obj %}
         <div class="container border">
                 <div class="row">
